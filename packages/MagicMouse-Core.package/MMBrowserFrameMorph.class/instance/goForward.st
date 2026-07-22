@@ -1,0 +1,3 @@
+navigation
+goForward
+	browser goForward

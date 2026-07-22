@@ -1,0 +1,17 @@
+{
+	"category" : "MagicMouse-Core",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "<historical>",
+	"instvars" : [
+		"browser",
+		"toolbar",
+		"urlField",
+		"toolbarVisible" ],
+	"name" : "MMBrowserFrameMorph",
+	"pools" : [
+		 ],
+	"super" : "Morph",
+	"type" : "normal" }

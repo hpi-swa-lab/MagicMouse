@@ -1,0 +1,3 @@
+navigation
+doRefresh
+	browser doRefresh
