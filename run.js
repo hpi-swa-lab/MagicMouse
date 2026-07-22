@@ -49,10 +49,14 @@ const run = async () => {
   };
 
   const browser = await puppeteer.launch({
+    headless: headless,
     ignoreDefaultArgs: true,
     args: [
       "--enable-automation",
-      ...(headless ? ["--headless"] : []),
+      // ignoreDefaultArgs strips puppeteer's own headless flag, so add it manually
+      ...(headless ? ["--headless=new"] : []),
+      "--no-first-run",
+      "--no-default-browser-check",
       // '--start-fullscreen',
       "--force-device-scale-factor=1",
       `--user-data-dir=${chromeProfilePath}`,
@@ -60,6 +64,8 @@ const run = async () => {
     executablePath: findChrome(),
   });
   const page = await browser.newPage();
+  // Raw CDP session for screencast (modern puppeteer has no page.startScreencast)
+  const cdp = await page.createCDPSession();
   await page.setBypassCSP(true);
   await page.setUserAgent(
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
@@ -262,7 +268,7 @@ const run = async () => {
     sendCommand(buf.toBuffer());
   };
 
-  page.on("screencastframe", async (frame) => {
+  cdp.on("Page.screencastFrame", async (frame) => {
     const screenshot = Buffer.from(frame.data, "base64");
 
     const buf = new SmartBuffer();
@@ -293,7 +299,7 @@ const run = async () => {
 
     await refreshTrackedElements();
 
-    await page.screencastFrameAck(frame.sessionId);
+    await cdp.send("Page.screencastFrameAck", { sessionId: frame.sessionId });
     console.error(`Sent frame at ${Date.now() / 1000}`);
   });
 
@@ -344,7 +350,7 @@ const run = async () => {
   await page.goto(url);
 
   console.error("Starting screencast...");
-  await page.startScreencast({
+  await cdp.send("Page.startScreencast", {
     format: IMAGE_FORMAT === "jpeg" ? "jpeg" : "png",
     everyNthFrame: 1,
   });
