@@ -6,6 +6,37 @@ const awaitifyStream = require("awaitify-stream");
 const { getElements } = require("./getElements");
 const uuid = require("uuid").v1;
 
+// DEBUG: mirror all console.error output to a logfile so we can inspect the
+// node side independently of Squeak's fragile stderr-to-Transcript path.
+const fs = require("fs");
+const LOGFILE = "/tmp/mm-node.log";
+{
+  const origError = console.error.bind(console);
+  console.error = (...args) => {
+    try {
+      fs.appendFileSync(
+        LOGFILE,
+        new Date().toISOString() +
+          " " +
+          args
+          .map((a) =>
+            typeof a === "string"
+              ? a
+              : a instanceof Error
+                ? a.stack || a.message
+                : JSON.stringify(a),
+          )
+          .join(" ") +
+          "\n",
+      );
+    } catch (e) {
+      /* ignore */
+    }
+    origError(...args);
+  };
+  fs.writeFileSync(LOGFILE, new Date().toISOString() + " === run.js started ===\n");
+}
+
 Array.prototype.flat = function () {
   return this.reduce((acc, x) => acc.concat(x), []);
 };
@@ -48,6 +79,51 @@ const run = async () => {
     process.stdout.write(buffer);
   };
 
+  const sendEvalReply = (requestId, ok, resultString) => {
+    const buf = new SmartBuffer();
+    buf.writeString("v");
+    buf.writeUInt32LE(requestId);
+    buf.writeUInt8(ok);
+    buf.writeStringPrependSize(resultString);
+    sendCommand(buf.toBuffer());
+  };
+
+  // Fire-and-forget JS eval. Never blocks the command loop. Always sends
+  // exactly one reply (value, error, or watchdog timeout), carrying the
+  // requestId so replies can arrive in any order.
+  const EVAL_WATCHDOG_MS = 20000;
+  const evalAndReply = (requestId, js) => {
+    let settled = false;
+    const reply = (ok, str) => {
+      if (settled) return;
+      settled = true;
+      sendEvalReply(requestId, ok, str);
+    };
+    const watchdog = setTimeout(() => {
+      reply(0, "eval timed out in browser");
+    }, EVAL_WATCHDOG_MS);
+    Promise.resolve()
+      .then(() => page.evaluate(js))
+      .then((value) => {
+        clearTimeout(watchdog);
+        reply(1, value === undefined ? "undefined" : String(value));
+      })
+      .catch((error) => {
+        clearTimeout(watchdog);
+        reply(0, String(error && error.message ? error.message : error));
+      });
+  };
+
+  // Remove a stale SingletonLock left behind by a previously-killed Chrome,
+  // otherwise the launch aborts with "Failed to create SingletonLock".
+  for (const name of ["SingletonLock", "SingletonCookie", "SingletonSocket"]) {
+    try {
+      fs.unlinkSync(`${chromeProfilePath}/${name}`);
+    } catch (e) {
+      /* not present -- fine */
+    }
+  }
+
   const browser = await puppeteer.launch({
     headless: headless,
     ignoreDefaultArgs: true,
@@ -57,12 +133,45 @@ const run = async () => {
       ...(headless ? ["--headless=new"] : []),
       "--no-first-run",
       "--no-default-browser-check",
+      // Do NOT spawn the crashpad handler: it is a detached helper that
+      // outlives kill -9 of the main process and keeps the profile's
+      // SingletonLock held, so the next launch fails with
+      // "Failed to create SingletonLock: File exists".
+      "--disable-crash-reporter",
+      "--disable-breakpad",
+      "--no-crash-upload",
       // '--start-fullscreen',
       "--force-device-scale-factor=1",
       `--user-data-dir=${chromeProfilePath}`,
     ],
     executablePath: findChrome(),
   });
+
+  // Belt and braces: whenever this node process exits for ANY reason, make
+  // sure the entire Chrome tree dies too, so no orphaned crashpad/zygote
+  // keeps the profile locked. browser.process() is the top chrome pid; we
+  // kill its whole process group.
+  const killChromeTree = () => {
+    try {
+      const proc = browser.process();
+      if (proc && proc.pid) {
+        try {
+          process.kill(-proc.pid, "SIGKILL"); // negative pid = process group
+        } catch (e) {
+          try {
+            proc.kill("SIGKILL");
+          } catch (e2) {
+            /* ignore */
+          }
+        }
+      }
+    } catch (e) {
+      /* ignore */
+    }
+  };
+  process.on("exit", killChromeTree);
+  process.on("SIGINT", () => process.exit());
+  process.on("SIGHUP", () => process.exit());
   const page = await browser.newPage();
   // Raw CDP session for screencast (modern puppeteer has no page.startScreencast)
   const cdp = await page.createCDPSession();
@@ -356,6 +465,18 @@ const run = async () => {
   });
   console.error("Recording screencast...");
 
+  // Heartbeat: a static page produces no screencast frames, so the stream can
+  // legitimately go silent. The Squeak reader errors after 30s without data
+  // ("Did not receive a frame in 30 seconds"). Send a tiny "p" (ping) every
+  // 10s so the stream stays alive; Squeak ignores it. (Do NOT unref() this
+  // timer -- that lets node's event loop exit and closes the connection.)
+  setInterval(() => {
+    const buf = new SmartBuffer();
+    buf.writeString("p");
+    sendCommand(buf.toBuffer());
+    console.error("heartbeat ping sent");
+  }, 10000);
+
   const reader = awaitifyStream.createReader(process.stdin);
   while (true) {
     const size = (await reader.readAsync(4)).readUInt32BE();
@@ -509,6 +630,16 @@ const run = async () => {
         } catch (error) {
           console.error(error);
         }
+        break;
+      }
+      case "v": {
+        // Evaluate JavaScript in the page and send the stringified result back.
+        // Payload: uint32 requestId, then the JS source. Fire-and-forget (no
+        // await) so a slow/hung eval never blocks the command loop.
+        const requestId = payload.readUInt32LE();
+        const js = payload.readString();
+        console.error(`Eval request ${requestId}: ${js}`);
+        evalAndReply(requestId, js);
         break;
       }
       case "e": {
