@@ -3,7 +3,8 @@
 		"open" : "MCPServer 7/22/2026 18:46",
 		"openOn:" : "MCPServer 7/22/2026 18:46" },
 	"instance" : {
-		"addModelItemsToWindowMenu:" : "MCPServer 7/22/2026 18:45",
+		"addModelItemsToWindowMenu:" : "MCPServer 7/22/2026 19:21",
+		"applyZoom" : "MCPServer 7/22/2026 19:20",
 		"browser" : "MCPServer 7/22/2026 18:45",
 		"connect:" : "MCPServer 7/22/2026 18:45",
 		"defaultExtent" : "MCPServer 7/22/2026 18:59",
@@ -13,7 +14,8 @@
 		"goForward" : "MCPServer 7/22/2026 18:45",
 		"initToolbar" : "MCPServer 7/22/2026 18:52",
 		"initialExtent" : "MCPServer 7/22/2026 18:59",
-		"initialize" : "MCPServer 7/22/2026 18:59",
+		"initialize" : "MCPServer 7/22/2026 19:21",
+		"onLocationChanged" : "MCPServer 7/22/2026 19:21",
 		"openDevTools" : "MCPServer 7/22/2026 18:45",
 		"openInWindowLabeled:inWorld:" : "MCPServer 7/22/2026 18:59",
 		"reconnect" : "MCPServer 7/22/2026 18:45",
@@ -25,4 +27,11 @@
 		"updateToolbarVisibility" : "MCPServer 7/22/2026 18:46",
 		"updateUrlField" : "MCPServer 7/22/2026 18:45",
 		"urlFieldAccepted:" : "MCPServer 7/22/2026 18:45",
-		"urlFieldText" : "MCPServer 7/22/2026 18:45" } }
+		"urlFieldText" : "MCPServer 7/22/2026 18:45",
+		"zoom" : "MCPServer 7/22/2026 19:20",
+		"zoom:" : "MCPServer 7/22/2026 19:20",
+		"zoomIn" : "MCPServer 7/22/2026 19:28",
+		"zoomOut" : "MCPServer 7/22/2026 19:28",
+		"zoomReset" : "MCPServer 7/22/2026 19:20",
+		"zoomResetLabel" : "MCPServer 7/22/2026 19:21",
+		"zoomSteps" : "MCPServer 7/22/2026 19:28" } }

@@ -10,6 +10,6 @@ initialize
 	self initToolbar.
 	browser := MMBrowserMorph new.
 	browser hResizing: #spaceFill; vResizing: #spaceFill.
-	browser when: #locationChanged send: #updateUrlField to: self.
+	browser when: #locationChanged send: #onLocationChanged to: self.
 	self addMorphBack: browser.
 	self updateToolbarVisibility

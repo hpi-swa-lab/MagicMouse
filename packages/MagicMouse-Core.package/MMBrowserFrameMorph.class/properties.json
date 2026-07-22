@@ -9,7 +9,8 @@
 		"browser",
 		"toolbar",
 		"urlField",
-		"toolbarVisible" ],
+		"toolbarVisible",
+		"zoom" ],
 	"name" : "MMBrowserFrameMorph",
 	"pools" : [
 		 ],
