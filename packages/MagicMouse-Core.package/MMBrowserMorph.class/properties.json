@@ -19,7 +19,9 @@
 		"portalMorphs",
 		"location",
 		"tmpDomainObject",
-		"previousOwner" ],
+		"previousOwner",
+		"pendingEvals",
+		"evalCounter" ],
 	"name" : "MMBrowserMorph",
 	"pools" : [
 		 ],

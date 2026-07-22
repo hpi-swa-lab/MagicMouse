@@ -2,6 +2,7 @@ events
 mouseDown: anEvent
 
 	| position |
+	self isConnected ifFalse: [^ self reconnect].
 	position := anEvent position - self position max: 0 @ 0.
 	(self class portalsOnRightClick and: [anEvent yellowButtonChanged])
 		ifTrue: [self sendEvent: #portal withPoint: position]

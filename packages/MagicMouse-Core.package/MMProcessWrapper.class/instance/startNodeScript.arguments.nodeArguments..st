@@ -4,6 +4,5 @@ startNodeScript: aString arguments: arguments nodeArguments: nodeArguments
 	| node |
 	node := OSProcess isWindows
 		ifTrue: ['node']
-		ifFalse: [(PipeableOSProcess command: 'command -v node') 
-			upToEndOfFile withBlanksTrimmed].
+		ifFalse: ['/home/jens/.nvm/versions/node/v22.14.0/bin/node'].
 	self startCommand: node withArguments: nodeArguments, {aString. '--'}, arguments

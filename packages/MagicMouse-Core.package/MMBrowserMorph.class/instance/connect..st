@@ -23,16 +23,4 @@ connect: aUrl
 			process startCommand: path withArguments: arguments].
 	
 	location := aUrl.
-	
-	imageUpdaterProcess := [
-		[ | length command payload |
-			length := process stdoutNextUint32.
-			payload := process stdoutNextBuffer: length.
-			command := payload unsignedCharAt: 1.
-			command caseOf: {
-				[$i] -> [self updateImage: payload].
-				[$h] -> [self handlePortal: payload].
-				[$l] -> [self locationUpdated: payload].
-				[$s] -> [self handleStructuredData: payload].
-				[$g] -> [self handleGitClone: payload].
-				[$f] -> [self handleFormFields: payload]}] repeat] fork
+	self startReaderLoop

@@ -2,6 +2,7 @@
 	"class" : {
 		 },
 	"instance" : {
+		"isRunning" : "MCPServer 7/22/2026 16:38",
 		"startCommand:withArguments:" : "MB 1/30/2022 10:33",
 		"stdinPutBuffer:" : "MB 1/30/2022 10:33",
 		"stdinPutUint32:" : "cmfcmf 8/3/2019 18:58",
