@@ -321,6 +321,33 @@ const run = async () => {
     await dialog.accept();
   });
 
+  // Forward the page's console.* output (and uncaught page errors) to Squeak as
+  // command "c": uint8 level, then the utf8 message. Levels: 0 log, 1 info,
+  // 2 warn, 3 error, 4 debug, 5 pageerror.
+  const sendConsole = (level, text) => {
+    const buf = new SmartBuffer();
+    buf.writeString("c");
+    buf.writeUInt8(level);
+    buf.writeStringPrependSize(text);
+    sendCommand(buf.toBuffer());
+  };
+  const CONSOLE_LEVELS = { log: 0, info: 1, warning: 2, error: 3, debug: 4 };
+  page.on("console", (msg) => {
+    try {
+      const level = CONSOLE_LEVELS[msg.type()] !== undefined ? CONSOLE_LEVELS[msg.type()] : 0;
+      sendConsole(level, msg.text());
+    } catch (e) {
+      /* ignore */
+    }
+  });
+  page.on("pageerror", (error) => {
+    try {
+      sendConsole(5, String(error && error.message ? error.message : error));
+    } catch (e) {
+      /* ignore */
+    }
+  });
+
   page.on("framenavigated", async (frame) => {
     await new Promise((resolve) => setTimeout(() => resolve(), 50));
     try {
