@@ -1,0 +1,3 @@
+model
+inputText
+	^ Text new

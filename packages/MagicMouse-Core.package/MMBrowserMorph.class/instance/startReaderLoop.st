@@ -10,7 +10,6 @@ startReaderLoop
 			length := process stdoutNextUint32.
 			payload := process stdoutNextBuffer: length.
 			command := payload unsignedCharAt: 1.
-			self logReader: 'recv cmd ', (String with: command), ' len ', length printString.
 			command caseOf: {
 				[$i] -> [self updateImage: payload].
 				[$h] -> [self handlePortal: payload].
@@ -19,6 +18,7 @@ startReaderLoop
 				[$g] -> [self handleGitClone: payload].
 				[$f] -> [self handleFormFields: payload].
 				[$v] -> [self handleEvalResult: payload].
+				[$c] -> [self handleConsole: payload].
 				[$p] -> ["heartbeat ping; keeps the stream alive, nothing to do"]}] repeat]
 			on: Error
-			do: [:e | self logReader: 'CONNECTION LOST: ', e messageText. self connectionLost: e messageText]] fork
+			do: [:e | self connectionLost: e messageText]] fork

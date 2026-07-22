@@ -1,0 +1,17 @@
+{
+	"category" : "MagicMouse-Core",
+	"classinstvars" : [
+		 ],
+	"classvars" : [
+		 ],
+	"commentStamp" : "<historical>",
+	"instvars" : [
+		"browser",
+		"consoleMorph",
+		"inputMorph",
+		"consoleText" ],
+	"name" : "MMDevToolsMorph",
+	"pools" : [
+		 ],
+	"super" : "Morph",
+	"type" : "normal" }

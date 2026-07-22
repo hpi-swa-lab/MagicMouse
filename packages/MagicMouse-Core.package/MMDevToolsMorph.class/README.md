@@ -1,0 +1,1 @@
+A minimal DevTools panel for an MMBrowserMorph. Top pane is a Transcript-like console showing the page's console.* output and JavaScript eval results. Bottom pane is a JavaScript workspace: select code and press Cmd+D (do it) to evaluate it in the connected Chrome page; the result is appended to the console. Wire it to a browser with MMDevToolsMorph openOn: aMMBrowserMorph.

@@ -1,0 +1,15 @@
+{
+	"class" : {
+		"openOn:" : "MCPServer 7/22/2026 17:47" },
+	"instance" : {
+		"acceptInput:" : "MCPServer 7/22/2026 17:41",
+		"appendConsole:level:" : "MCPServer 7/22/2026 17:42",
+		"browser:" : "MCPServer 7/22/2026 17:41",
+		"consoleMessage:" : "MCPServer 7/22/2026 17:41",
+		"consoleMorph" : "MCPServer 7/22/2026 17:47",
+		"consoleText" : "MCPServer 7/22/2026 17:41",
+		"evaluateExpression:requestor:" : "MCPServer 7/22/2026 17:41",
+		"evaluateJavaScript:" : "MCPServer 7/22/2026 17:41",
+		"initialize" : "MCPServer 7/22/2026 17:47",
+		"inputMorph" : "MCPServer 7/22/2026 17:47",
+		"inputText" : "MCPServer 7/22/2026 17:41" } }
