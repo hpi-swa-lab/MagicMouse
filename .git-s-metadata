@@ -1,0 +1,33 @@
+GSMetadata {
+	#version : 1,
+	#mappers : OrderedCollection [
+		GSCypressMapper {
+			#version : 1,
+			#package : MCPackage {
+				#name : 'BaselineOfMagicMouse'
+			},
+			#path : FSAbsolutePath [
+				'packages'
+			]
+		},
+		GSCypressMapper {
+			#version : 1,
+			#package : MCPackage {
+				#name : 'MagicMouse-Core'
+			},
+			#path : FSAbsolutePath [
+				'packages'
+			]
+		},
+		GSCypressMapper {
+			#version : 1,
+			#package : MCPackage {
+				#name : 'MagicMouse-Tests'
+			},
+			#path : FSAbsolutePath [
+				'packages'
+			]
+		}
+	],
+	#name : 'MagicMouse'
+}
