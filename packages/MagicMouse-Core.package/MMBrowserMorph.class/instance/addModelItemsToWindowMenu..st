@@ -4,6 +4,10 @@ addModelItemsToWindowMenu: aMenu
 
 	aMenu addLine.
 	aMenu
+		add: 'copy selection' translated
+		target: self
+		selector: #copySelection.
+	aMenu
 		add: 'DevTools' translated
 		target: self
 		selector: #openDevTools.

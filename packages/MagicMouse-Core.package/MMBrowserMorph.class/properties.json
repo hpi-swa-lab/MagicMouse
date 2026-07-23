@@ -5,6 +5,7 @@
 	"classvars" : [
 		"ChromeProfilePath",
 		"DebugEnabled",
+		"DebugEvents",
 		"DebugNodejs",
 		"DoNotUsePrebuiltBinary",
 		"GitRepositoryPath",

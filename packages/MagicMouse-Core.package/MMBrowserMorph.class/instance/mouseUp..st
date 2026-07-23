@@ -6,3 +6,4 @@ mouseUp: anEvent
 	self
 		sendEvent: #mouseMove withPoint: position;
 		sendEvent: (anEvent yellowButtonChanged ifTrue: [#mouseRightUp] ifFalse: [#mouseLeftUp])
+		withModifiers: anEvent
